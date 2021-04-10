@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "271712403370",
+    "project_id": "flutteshare-604d7",
+    "storage_bucket": "flutteshare-604d7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:271712403370:android:d3845d4d4560c5aceff5d3",
+        "android_client_info": {
+          "package_name": "com.dagmawi.fluttershare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "271712403370-frve9jss4f1jifcuqbukvo2pu4hht514.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOr7PUaf63MDvSTDLoGxGmTM2X7MB-Dcs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "271712403370-frve9jss4f1jifcuqbukvo2pu4hht514.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
