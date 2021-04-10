@@ -1,8 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluttershare/pages/activityFeed.dart';
+import 'package:fluttershare/pages/profile.dart';
+import 'package:fluttershare/pages/search.dart';
+import 'package:fluttershare/pages/timeline.dart';
+import 'package:fluttershare/pages/upload.dart';
 import 'package:fluttershare/widgets/logInForm.dart';
 import 'package:fluttershare/widgets/signUpForm.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -16,6 +22,9 @@ class _HomeState extends State<Home> {
   bool isAuth = false;
   final FirebaseAuth auth = FirebaseAuth.instance;
   bool showLogin = false;
+  PageController _pageController = PageController(initialPage: 1);
+  int currentBottomNavBarIndex = 0;
+  int currentPageIndex = 0;
 
   Widget loadingScreen() {
     return Scaffold(
@@ -37,27 +46,57 @@ class _HomeState extends State<Home> {
 
   Widget buildAuthenticatedScreen() {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(color: Colors.white),
-        alignment: Alignment.center,
-        child: TextButton(
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(Colors.blue),
+      body: PageView(
+        controller: _pageController,
+        physics: NeverScrollableScrollPhysics(),
+        onPageChanged: (int pageIndex) {
+          setState(() {
+            //when you navigate to a new page then update the current page index
+            this.currentPageIndex = pageIndex;
+          });
+        },
+        children: [
+          Timeline(),
+          ActivityFeed(),
+          Upload(),
+          Search(),
+          Profile(),
+        ],
+      ),
+      bottomNavigationBar: CupertinoTabBar(
+        currentIndex: currentBottomNavBarIndex,
+        activeColor: Theme.of(context).primaryColor,
+        onTap: (int pageIndex) {
+          setState(
+            () {
+              //update current navbar index
+              this.currentBottomNavBarIndex = pageIndex;
+
+              //go to specified page
+              _pageController.jumpToPage(pageIndex);
+            },
+          );
+        },
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.whatshot),
           ),
-          onPressed: () {
-            auth.signOut();
-            setState(() {
-              isAuth = false;
-            });
-          },
-          child: Text(
-            "Log out",
-            style: TextStyle(
-              color: Colors.white,
-              letterSpacing: 1.5,
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications_active),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.photo_camera,
+              size: 40.0,
             ),
           ),
-        ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+          ),
+        ],
       ),
     );
   }
@@ -156,5 +195,12 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return isAuth ? buildAuthenticatedScreen() : buildUnauthenticatedScreen();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _pageController.dispose();
   }
 }
