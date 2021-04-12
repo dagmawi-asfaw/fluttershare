@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -18,6 +19,7 @@ class _SignUpFormState extends State<SignUpForm> {
   IconData passwordIconData = Icons.visibility;
   IconData confirmPasswordIconData = Icons.visibility;
   TextEditingController _emailController = TextEditingController();
+  TextEditingController _usernameController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
   final _signUpFormKey = GlobalKey<FormState>();
@@ -54,7 +56,13 @@ class _SignUpFormState extends State<SignUpForm> {
 
   final emailValidator = MultiValidator([
     RequiredValidator(errorText: "email is required"),
-    EmailValidator(errorText: "please enter a valid email")
+    EmailValidator(errorText: "please enter a valid email"),
+  ]);
+
+  final usernameValidator = MultiValidator([
+    RequiredValidator(errorText: "user name is required"),
+    MinLengthValidator(5,
+        errorText: "username must have at least 5 characters ")
   ]);
 
   final passwordValidator = MultiValidator([
@@ -72,6 +80,26 @@ class _SignUpFormState extends State<SignUpForm> {
       return "passwords do not match please try again";
     }
     return null;
+  }
+
+  void createUserInFireStore({User user, String userName}) {
+    String id = user.uid;
+    String username = userName;
+    String email = user.email;
+    String displayName = user.displayName;
+    String bio = "";
+    String photoUrl = user.photoURL;
+    DateTime timestamp = DateTime.now();
+    FirebaseFirestore.instance.collection("users").add({
+      'id': id,
+      'username': username,
+      'email': email,
+      'displayName': displayName,
+      'bio': bio,
+      'timestamp': timestamp.toString()
+    }).catchError((error) {
+      print("Failed to add user : $error");
+    });
   }
 
   @override
@@ -93,6 +121,26 @@ class _SignUpFormState extends State<SignUpForm> {
                 ),
                 decoration: InputDecoration(
                   labelText: "Email",
+                  labelStyle: TextStyle(
+                    fontSize: 15.0,
+                    color: Colors.white,
+                  ),
+                  fillColor: Theme.of(context).primaryColorLight,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              TextFormField(
+                controller: _usernameController,
+                validator: usernameValidator,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16.0,
+                ),
+                decoration: InputDecoration(
+                  labelText: "Username ",
                   labelStyle: TextStyle(
                     fontSize: 15.0,
                     color: Colors.white,
@@ -169,9 +217,19 @@ class _SignUpFormState extends State<SignUpForm> {
                   if (_signUpFormKey.currentState.validate()) {
                     String email = _emailController.text;
                     String password = _passwordController.text;
+                    String username = _usernameController.text;
+
+                    //check if the user exists
+
                     try {
-                      widget.auth.createUserWithEmailAndPassword(
-                          email: email, password: password);
+                      widget.auth
+                          .createUserWithEmailAndPassword(
+                              email: email, password: password)
+                          .then((UserCredential userCred) {
+                        //save user to database
+                        createUserInFireStore(
+                            user: userCred.user, userName: username);
+                      });
                     } on FirebaseAuthException catch (e) {
                       if (e.code == 'weak-password') {
                         print('The password provided is too weak.');

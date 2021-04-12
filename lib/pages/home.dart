@@ -3,7 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttershare/pages/activityFeed.dart';
 import 'package:fluttershare/pages/profile.dart';
 import 'package:fluttershare/pages/search.dart';
@@ -22,26 +21,34 @@ class _HomeState extends State<Home> {
   bool isAuth = false;
   final FirebaseAuth auth = FirebaseAuth.instance;
   bool showLogin = false;
-  PageController _pageController = PageController(initialPage: 1);
+  PageController _pageController = PageController(initialPage: 0);
   int currentBottomNavBarIndex = 0;
-  int currentPageIndex = 0;
 
-  Widget loadingScreen() {
-    return Scaffold(
-      body: Container(
-        child: SpinKitFadingCircle(
-          color: Theme.of(context).primaryColor,
-          size: 80.0,
-        ),
-      ),
+  void toggleUserForm({bool showLogin, bool showSignUp}) {
+    setState(
+      () {
+        this.showLogin = !this.showLogin;
+      },
     );
   }
 
-  void toggleUserForm({bool showLogin, bool showSignUp}) {
-    setState(() {
-      this.showLogin = !this.showLogin;
+  void createUserInFireStore({User user, String userName}) {
+    String id = user.uid;
+    String username = userName;
+    String email = user.email;
+    String displayName = user.displayName;
+    String bio = "";
+    DateTime timestamp = DateTime.now();
+    usersRef.add({
+      'id':id,
+      'username':username,
+      'email': email,
+      'displayName':displayName,
+      'bio': bio,
+      'timestamp': timestamp.toString()
+    }).catchError((error){
+      print("Failed to add user : $error");
     });
-    print("I AM TRIGGERED ${this.showLogin}");
   }
 
   Widget buildAuthenticatedScreen() {
@@ -49,12 +56,6 @@ class _HomeState extends State<Home> {
       body: PageView(
         controller: _pageController,
         physics: NeverScrollableScrollPhysics(),
-        onPageChanged: (int pageIndex) {
-          setState(() {
-            //when you navigate to a new page then update the current page index
-            this.currentPageIndex = pageIndex;
-          });
-        },
         children: [
           Timeline(),
           ActivityFeed(),
@@ -73,7 +74,11 @@ class _HomeState extends State<Home> {
               this.currentBottomNavBarIndex = pageIndex;
 
               //go to specified page
-              _pageController.jumpToPage(pageIndex);
+              _pageController.animateToPage(
+                pageIndex,
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
             },
           );
         },
@@ -182,7 +187,6 @@ class _HomeState extends State<Home> {
       if (user != null) {
         setState(() {
           isAuth = true;
-          print("User Authenticated $user");
         });
       } else if (user != null) {
         setState(() {
