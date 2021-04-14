@@ -183,7 +183,6 @@ class _LogInFormState extends State<LogInForm> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _emailController.dispose();
     _passwordController.dispose();

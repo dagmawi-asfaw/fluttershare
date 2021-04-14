@@ -181,7 +181,6 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     FirebaseAuth.instance.authStateChanges().listen((User user) {
       if (user != null) {
@@ -203,7 +202,6 @@ class _HomeState extends State<Home> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _pageController.dispose();
   }

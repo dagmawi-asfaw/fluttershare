@@ -99,13 +99,15 @@ class _SearchState extends State<Search> {
       child: Center(
         child: ListView(
           children: [
-            SizedBox(
-              height: (orientation == Orientation.portrait) ? null : 15.0,
-            ),
-            SvgPicture.asset(
-              "assets/images/search.svg",
-              semanticsLabel: "Search",
-              height: (orientation == Orientation.portrait) ? 400.0 : 150.0,
+            Padding(
+              padding: EdgeInsets.only(
+                top: (orientation == Orientation.portrait) ? 60.0 : 15.0,
+              ),
+              child: SvgPicture.asset(
+                "assets/images/search.svg",
+                semanticsLabel: "Search",
+                height: (orientation == Orientation.portrait) ? 300.0 : 150.0,
+              ),
             ),
             Text(
               "Find users",
@@ -125,7 +127,6 @@ class _SearchState extends State<Search> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _searchFieldController = TextEditingController();
   }
@@ -142,7 +143,6 @@ class _SearchState extends State<Search> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _searchFieldController.dispose();
   }
@@ -158,10 +158,9 @@ class UserResult extends StatelessWidget {
     return Container(
       color: Theme.of(context).primaryColor.withOpacity(0.7),
       child: Column(
-
         children: [
           GestureDetector(
-            onTap: (){
+            onTap: () {
               print("I have been tapped");
             },
             child: ListTile(
