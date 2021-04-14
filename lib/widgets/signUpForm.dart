@@ -96,7 +96,8 @@ class _SignUpFormState extends State<SignUpForm> {
       'email': email,
       'displayName': displayName,
       'bio': bio,
-      'timestamp': timestamp.toString()
+      'photoUrl': photoUrl,
+      'timestamp': timestamp.toString(),
     }).catchError((error) {
       print("Failed to add user : $error");
     });
@@ -227,6 +228,7 @@ class _SignUpFormState extends State<SignUpForm> {
                               email: email, password: password)
                           .then((UserCredential userCred) {
                         //save user to database
+                        print("USER CRED --> ${userCred.user}");
                         createUserInFireStore(
                             user: userCred.user, userName: username);
                       });
