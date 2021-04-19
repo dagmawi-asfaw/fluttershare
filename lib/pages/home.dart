@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -11,6 +12,8 @@ import 'package:fluttershare/pages/upload.dart';
 import 'package:fluttershare/widgets/logInForm.dart';
 import 'package:fluttershare/widgets/signUpForm.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+
 
 class Home extends StatefulWidget {
   @override
@@ -40,13 +43,13 @@ class _HomeState extends State<Home> {
     String bio = "";
     DateTime timestamp = DateTime.now();
     usersRef.add({
-      'id':id,
-      'username':username,
+      'id': id,
+      'username': username,
       'email': email,
-      'displayName':displayName,
+      'displayName': displayName,
       'bio': bio,
       'timestamp': timestamp.toString()
-    }).catchError((error){
+    }).catchError((error) {
       print("Failed to add user : $error");
     });
   }
@@ -59,7 +62,9 @@ class _HomeState extends State<Home> {
         children: [
           Timeline(),
           ActivityFeed(),
-          Upload(),
+          Upload(
+            currentUser: auth.currentUser,
+          ),
           Search(),
           Profile(),
         ],
