@@ -9,9 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttershare/pages/home.dart';
 import 'package:fluttershare/widgets/progress.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as Im;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:uuid/uuid.dart';
 
 class Upload extends StatefulWidget {
@@ -234,7 +237,11 @@ class _UploadState extends State<Upload> {
       {String mediaUrl, String description, String location}) async {
     CollectionReference postsRef =
         FirebaseFirestore.instance.collection('posts');
-    await postsRef.doc('${widget.currentUser.uid}').collection('userPosts').doc("$postId").set(
+    await postsRef
+        .doc('${widget.currentUser.uid}')
+        .collection('userPosts')
+        .doc("$postId")
+        .set(
       {
         "postId": postId,
         "ownerId": widget.currentUser.uid,
@@ -246,6 +253,34 @@ class _UploadState extends State<Upload> {
         "likes": ""
       },
     );
+  }
+
+  getUserLocation() async {
+    //ask for permission
+    PermissionStatus status = await Permission.location.request();
+    if (status == PermissionStatus.granted) {
+      bool isServiceEnabled = await Geolocator.isLocationServiceEnabled();
+      //check if location services are enabled
+      if (isServiceEnabled) {
+        //get current location of user
+        Position position = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high);
+
+        //get place mark from user location coordinates
+        List<Placemark> placeMarks = await placemarkFromCoordinates(
+            position.latitude, position.longitude);
+        Placemark placeMark = placeMarks[0];
+
+        String formatedLocation = "${placeMark.locality}, ${placeMark.country}";
+
+        locationController.text = formatedLocation;
+      } else {
+        return Future.error("Location services are disabled");
+      }
+    } else if ((status == PermissionStatus.permanentlyDenied)) {
+      return Future.error(
+          "Location permissions are permanently denied, we cannot request permissions.");
+    }
   }
 
   buildUploadForm() {
@@ -346,7 +381,7 @@ class _UploadState extends State<Upload> {
               height: 100.0,
               alignment: Alignment.center,
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: getUserLocation,
                 icon: Icon(
                   Icons.my_location,
                   color: Colors.white,
