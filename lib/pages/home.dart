@@ -14,7 +14,6 @@ import 'package:fluttershare/widgets/signUpForm.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
-
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -66,7 +65,9 @@ class _HomeState extends State<Home> {
             currentUser: auth.currentUser,
           ),
           Search(),
-          Profile(),
+          Profile(
+            currentUserId: auth.currentUser?.uid,
+          ),
         ],
       ),
       bottomNavigationBar: CupertinoTabBar(

@@ -90,7 +90,7 @@ class _SignUpFormState extends State<SignUpForm> {
     String bio = "";
     String photoUrl = user.photoURL;
     DateTime timestamp = DateTime.now();
-    FirebaseFirestore.instance.collection("users").add({
+    FirebaseFirestore.instance.collection("users").doc(id).set({
       'id': id,
       'username': username,
       'email': email,
