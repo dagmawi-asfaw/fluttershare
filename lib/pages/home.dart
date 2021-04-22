@@ -10,6 +10,7 @@ import 'package:fluttershare/pages/search.dart';
 import 'package:fluttershare/pages/timeline.dart';
 import 'package:fluttershare/pages/upload.dart';
 import 'package:fluttershare/widgets/logInForm.dart';
+import 'package:fluttershare/widgets/post.dart';
 import 'package:fluttershare/widgets/signUpForm.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
